@@ -1,0 +1,3 @@
+package in.simplifymoney.ledgersync.store;
+import in.simplifymoney.ledgersync.model.NormalizedTxn; import java.util.*;
+public final class Backfill { private final SqlLedgerStore source; private final DocumentStore target; public Backfill(SqlLedgerStore s,DocumentStore t){source=s;target=t;} public Result run(){long r=0,w=0,s=0;for(NormalizedTxn t:source.all()){r++;boolean exists=false;for(String id:t.sourceMessageIds())if(target.byMessageId(id).isPresent()){exists=true;break;}if(exists){s++;continue;}target.save(t);w++;}return new Result(r,w,s);} public record Result(long read,long written,long skipped){} }
